@@ -24,19 +24,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_USER: my_db_user
-      DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_PASSWORD: my_db_password
-      DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_DB_NAME: my_db
-
-      #mysql
-      #DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_HOST: db_in_mysql
-
-      #postgres
-      DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_HOST: db_in_postgres
-
-      #sqlite
-      #DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_HOST: /app/rails-app/my_db.sqlite3
     volumes:
       - ./:/app
     ports:
