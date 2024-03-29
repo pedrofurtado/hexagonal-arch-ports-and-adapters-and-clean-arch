@@ -39,10 +39,9 @@ module DomainCore
       def list_all_products
         db = SQLite3::Database.new "/app/my_db.sqlite3"
         db.results_as_hash = true
-        rows = db.execute File.read('/app/initdb.sql')
-        db.execute("SELECT * FROM products") do |row|
-          raise row.inspect
-        end
+        sql_commands = File.read('/app/initdb.sql')
+        db.execute_batch sql_commands
+        db.execute("SELECT * FROM products")
       end
     end
   end
@@ -80,6 +79,7 @@ module DomainCore
         credentials = DomainCore::DependencyInversion::Container.instance.get('database_adapter_credentials').credentials
 
         mysql_client = Mysql2::Client.new(
+          connect_timeout: 3,
           host: credentials[:host],
           username: credentials[:username],
           password: credentials[:password],
@@ -168,7 +168,7 @@ end
 #######initializers
 
 # [CHANGE ONLY HERE]
-db_adapter = 'mysql' # mysql | postgres | sqlite
+db_adapter = 'sqlite' # mysql | postgres | sqlite
 
 db_adapter_class = nil
 case db_adapter
