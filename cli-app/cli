@@ -1,0 +1,35 @@
+require "thor"
+require 'terminal-table'
+require '/app/domain_core.rb'
+
+ENV['THOR_SILENCE_DEPRECATION'] = 'true'
+
+class MyCLI < Thor
+  desc "hello [NAME]", "fake command to print hello in terminal"
+  def hello(name)
+    puts "Hello #{name}"
+  end
+
+  desc "list_all_products", "Get all products using the Domain Core"
+  def list_all_products
+    list_products_use_case = DomainCore::UseCases::ListProducts.new do |callbacks|
+      callbacks.on_success = Proc.new do |products_records_list|
+        rows = products_records_list.map do |product_record|
+          [product_record.id, product_record.name, product_record.status]
+        end
+
+        table = ::Terminal::Table.new :title => "Products", :headings => ['ID', 'Full name', 'Status'], :rows => rows
+        puts table
+      end
+
+      callbacks.on_failure = Proc.new do |error|
+        table = ::Terminal::Table.new :headings => ['ERROR'], :rows => [[error.message]]
+        puts table
+      end
+    end
+
+    list_products_use_case.execute()
+  end
+end
+
+MyCLI.start(ARGV)

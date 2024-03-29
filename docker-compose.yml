@@ -19,7 +19,7 @@ services:
       MYSQL_ROOT_PASSWORD: 'my_db_root_password'
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
-  rails-app:
+  ruby-environment:
     restart: always
     build:
       context: .
@@ -41,4 +41,5 @@ services:
       - ./:/app
     ports:
       - 3000:3000
-    command: /bin/bash -c "cd /app/rails-app/ && rm -Rf tmp/pids/server.pid && bundle install && bin/rails server -b 0.0.0.0 -p 3000"
+      - 3001:3001
+    command: /bin/bash -c "tail -f /dev/null"
