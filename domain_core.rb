@@ -168,7 +168,7 @@ end
 #######initializers
 
 # [CHANGE ONLY HERE]
-db_adapter = 'sqlite' # mysql | postgres | sqlite
+db_adapter = 'mysql' # mysql | postgres | sqlite
 
 db_adapter_class = nil
 case db_adapter
