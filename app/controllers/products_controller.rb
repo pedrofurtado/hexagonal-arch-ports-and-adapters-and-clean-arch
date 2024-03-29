@@ -1,7 +1,5 @@
 #domain core
-require 'ostruct'
 require 'singleton'
-
 module DomainCore
   module DependencyInversion
     class Container
@@ -21,36 +19,77 @@ end
 
 module DomainCore
   module DatabaseAdapters
+    class Credentials
+      def credentials
+        {
+          host:     ENV.fetch('DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_HOST'),
+          username: ENV.fetch('DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_USER'),
+          password: ENV.fetch('DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_PASSWORD'),
+          database: ENV.fetch('DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_DB_NAME')
+        }
+      end
+    end
+  end
+end
+
+require "sqlite3"
+module DomainCore
+  module DatabaseAdapters
     class SQLite
       def list_all_products
-        success = false
-        if success
-          [{ 'identifier' => '10', 'full_name' => 'Shoes', 'state' => 'in_sale' }, { 'identifier' => '28', 'full_name' => 'T-shirt', 'state' => 'in_preparation' }]
-        else
-          raise StandardError.new('error on database, sqlite crashed!')
+        db = SQLite3::Database.new "/app/my_db.sqlite3"
+        db.results_as_hash = true
+        rows = db.execute File.read('/app/initdb.sql')
+        db.execute("SELECT * FROM products") do |row|
+          raise row.inspect
         end
       end
     end
+  end
+end
 
+require "pg"
+module DomainCore
+  module DatabaseAdapters
     class Postgres
       def list_all_products
-        success = true
-        if success
-          [{ 'identifier' => '40', 'full_name' => 'Headphone bluetooth', 'state' => 'selled' }]
-        else
-          raise StandardError.new('error on database, postgres crashed!')
-        end
+        credentials = DomainCore::DependencyInversion::Container.instance.get('database_adapter_credentials').credentials
+
+        client = PG.connect(
+          host: credentials[:host],
+          dbname: credentials[:database],
+          user: credentials[:username],
+          password: credentials[:password]
+        )
+
+        data_from_db = client.query("SELECT * FROM products")
+
+        client.close
+
+        data_from_db
       end
     end
+  end
+end
 
+require "mysql2"
+module DomainCore
+  module DatabaseAdapters
     class Mysql
       def list_all_products
-        success = false
-        if success
-          [{ 'identifier' => '8', 'full_name' => 'Water glass', 'state' => 'ready' }, { 'identifier' => '96', 'full_name' => 'Orange juice', 'state' => 'cold' }, { 'identifier' => '3', 'full_name' => 'Dell notebook', 'state' => 'installed' }]
-        else
-          raise StandardError.new('error on database, mysql crashed!')
-        end
+        credentials = DomainCore::DependencyInversion::Container.instance.get('database_adapter_credentials').credentials
+
+        mysql_client = Mysql2::Client.new(
+          host: credentials[:host],
+          username: credentials[:username],
+          password: credentials[:password],
+          database: credentials[:database]
+        )
+
+        data_from_db = mysql_client.query("SELECT * FROM products", as: :hash).to_a
+        mysql_client.close
+
+        data_from_db
       end
     end
   end
@@ -61,7 +100,11 @@ module DomainCore
     class ProductRecord
       attr_accessor :id, :name, :status
     end
+  end
+end
 
+module DomainCore
+  module Repositories
     class Product
       def list_all
         database_adapter = DomainCore::DependencyInversion::Container.instance.get('database_adapter')
@@ -74,7 +117,7 @@ module DomainCore
 
           product_record.id = item_from_db['identifier']
           product_record.name = item_from_db['full_name']
-          product_record.status = item_from_db['state']
+          product_record.status = item_from_db['state_name']
 
           product_records_list << product_record
         end
@@ -98,7 +141,11 @@ module DomainCore
         on_failure.call(result)
       end
     end
+  end
+end
 
+module DomainCore
+  module UseCases
     class ListProducts
       def initialize(&block)
         @callbacks = CallbackHandlers.new
@@ -109,10 +156,8 @@ module DomainCore
         products_repository = DomainCore::DependencyInversion::Container.instance.get('products_repository')
 
         begin
-          #
           @callbacks.on_success_handler(products_repository.list_all)
         rescue => e
-          #OpenStruct.new(message: 'error very crazy, broked!')
           @callbacks.on_failure_handler(e)
         end
       end
@@ -123,17 +168,18 @@ end
 #initializers
 DomainCore::DependencyInversion::Container.instance.register('products_repository', DomainCore::Repositories::Product)
 DomainCore::DependencyInversion::Container.instance.register('database_adapter', DomainCore::DatabaseAdapters::Postgres)
+DomainCore::DependencyInversion::Container.instance.register('database_adapter_credentials', DomainCore::DatabaseAdapters::Credentials)
 
 # inside rails app
 class ProductsController < ActionController::API
   def index
     list_products_use_case = DomainCore::UseCases::ListProducts.new do |callbacks|
-      callbacks.on_success = Proc.new do |products|
-        payload = products.map do |product|
+      callbacks.on_success = Proc.new do |products_records_list|
+        payload = products_records_list.map do |product_record|
           {
-            Id: product.id,
-            Name: product.name,
-            Situation: product.status
+            Id: product_record.id,
+            Name: product_record.name,
+            Situation: product_record.status
           }
         end
 
