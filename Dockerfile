@@ -6,9 +6,6 @@ RUN apt-get update -qq && \
                                                libvips \
                                                default-libmysqlclient-dev
 EXPOSE 3000
+EXPOSE 3001
 WORKDIR /app
-COPY Gemfile Gemfile
-COPY Gemfile.lock Gemfile.lock
-RUN bundle install
 COPY . .
-CMD ["./bin/rails", "server", "-b", "0.0.0.0"]

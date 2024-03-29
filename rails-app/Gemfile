@@ -9,7 +9,6 @@ gem "bootsnap", require: false
 # ==========
 
 # gems required by domain core
-
 # domain core - database adapters
 gem "sqlite3"
 gem "pg"
