@@ -1,11 +1,11 @@
-# Hexagonal arch - Ports and adapters
+# Hexagonal arch (Ports and adapters) and Clean arch
 
 ```bash
 #docker environment
 docker-compose up --build -d
 
 #connect to container bash
-docker container exec -it hexagonal-arch-ports-and-adapters_ruby-environment_1 /bin/bash
+docker container exec -it hexagonal-arch-ports-and-adapters-and-clean-arch_ruby-environment_1 /bin/bash
 
 #rails app (inside bash)
 # access GET http://localhost:3000/products
