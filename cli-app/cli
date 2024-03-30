@@ -1,6 +1,6 @@
 require "thor"
 require 'terminal-table'
-require '/app/domain_core.rb'
+require '/app/domain-core/all'
 
 ENV['THOR_SILENCE_DEPRECATION'] = 'true'
 

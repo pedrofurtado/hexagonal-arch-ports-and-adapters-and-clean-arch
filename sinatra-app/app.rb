@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'sinatra/reloader'
 
-require '/app/domain_core.rb'
+require '/app/domain-core/all'
 
 configure do
   enable :reloader

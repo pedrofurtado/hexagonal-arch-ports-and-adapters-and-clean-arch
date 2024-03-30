@@ -1,4 +1,4 @@
-require '/app/domain_core.rb'
+require '/app/domain-core/all'
 
 class ProductsController < ActionController::API
   def index

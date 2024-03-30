@@ -25,3 +25,6 @@ cd /app/sinatra-app/ && bundle install && bundle exec rackup --host 0.0.0.0 --po
   # invalid command
   cd /app/cli-app/ && bundle install && ruby ./cli blabla
 ```
+
+
+URL for reference: https://jmgarridopaz.github.io/content/hexagonalarchitecture.html
