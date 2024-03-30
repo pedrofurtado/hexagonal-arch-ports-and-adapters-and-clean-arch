@@ -22,3 +22,4 @@ ENV['DOMAIN_CORE_DATABASE_ADAPTERS_CREDENTIALS_DB_NAME'] = 'my_db'
 DomainCore::DependencyInversion::Container.instance.register('products_repository', DomainCore::Repositories::Product)
 DomainCore::DependencyInversion::Container.instance.register('database_adapter', db_adapter_class)
 DomainCore::DependencyInversion::Container.instance.register('database_adapter_credentials', DomainCore::DatabaseAdapters::Credentials)
+DomainCore::DependencyInversion::Container.instance.register('list_products_validator', DomainCore::Validators::ListProduct)

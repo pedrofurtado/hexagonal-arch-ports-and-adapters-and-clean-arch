@@ -10,7 +10,9 @@ class MyCLI < Thor
     puts "Hello #{name}"
   end
 
-  desc "list_all_products", "Get all products using the Domain Core"
+  desc "list_all_products --id [ID] --situation [SITUATION]", "Get all products using the Domain Core"
+  option :id
+  option :situation
   def list_all_products
     list_products_use_case = DomainCore::UseCases::ListProducts.new do |callbacks|
       callbacks.on_success = Proc.new do |products_records_list|
@@ -28,7 +30,11 @@ class MyCLI < Thor
       end
     end
 
-    list_products_use_case.execute()
+    dto = DomainCore::Dtos::ListProduct.new
+    dto.id = options[:id]
+    dto.situation = options[:situation]
+
+    list_products_use_case.execute(dto)
   end
 end
 

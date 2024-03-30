@@ -30,5 +30,9 @@ get '/products' do
     end
   end
 
-  list_products_use_case.execute()
+  dto = DomainCore::Dtos::ListProduct.new
+  dto.id = params[:id]
+  dto.situation = params[:situation]
+
+  list_products_use_case.execute(dto)
 end

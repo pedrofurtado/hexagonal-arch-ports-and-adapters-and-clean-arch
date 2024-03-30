@@ -1,9 +1,9 @@
 module DomainCore
   module Repositories
     class Product
-      def list_all
+      def list_all(list_product_dto)
         database_adapter = DomainCore::DependencyInversion::Container.instance.get('database_adapter')
-        items_from_db = database_adapter.list_all_products
+        items_from_db = database_adapter.list_all_products(list_product_dto)
 
         product_records_list = []
 

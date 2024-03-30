@@ -20,6 +20,10 @@ class ProductsController < ActionController::API
       end
     end
 
-    list_products_use_case.execute()
+    dto = DomainCore::Dtos::ListProduct.new
+    dto.id = request.query_parameters['id']
+    dto.situation = request.query_parameters['situation']
+
+    list_products_use_case.execute(dto)
   end
 end
