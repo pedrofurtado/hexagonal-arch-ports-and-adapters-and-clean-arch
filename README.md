@@ -1,5 +1,26 @@
 # Hexagonal arch (Ports and adapters) and Clean arch
 
+Clean Arch Flow
+
+```
+Rails app -> controller -> use case (with input dto) -> repository -> validators/repositories -> adapters (database, etc.)
+                                                                                                      |
+                                                                                                      |
+             controller <-      json format          <-       presenter        <- output dto  <- adapters (database, etc.)
+
+
+Sinatra app -> controller -> use case (with input dto) -> repository -> validators/repositories -> adapters (database, etc.)
+                                                                                                      |
+                                                                                                      |
+               controller <-      xml format         <-       presenter        <- output dto    <- adapters (database, etc.)
+
+
+CLI app -> command -> use case (with input dto) -> repository -> validators/repositories -> adapters (database, etc.)
+                                                                                                      |
+                                                                                                      |
+           command <-  ascii terminal table format     <-   presenter   <- output dto    <- adapters (database, etc.)
+```
+
 ```bash
 #docker environment
 docker-compose up --build -d

@@ -9,28 +9,20 @@ configure do
 end
 
 get '/products' do
-  content_type :json
+  content_type 'text/plain'
 
   list_products_use_case = DomainCore::UseCases::ListProducts.new do |callbacks|
-    callbacks.on_success = Proc.new do |products_records_list|
-      payload = products_records_list.map do |product_record|
-        {
-          Codigo: product_record.id,
-          Nome: product_record.name,
-          Situacao: product_record.status
-        }
-      end
-
-      { results: payload }.to_json
+    callbacks.on_success = Proc.new do |products_presenter|
+      products_presenter.convert_to_xml
     end
 
     callbacks.on_failure = Proc.new do |error|
       status 501
-      { fail: error.message }.to_json
+      XmlSimple.xml_out({ fail: error.message }, {:keeproot => true, :noescape => true})
     end
   end
 
-  dto = DomainCore::Dtos::ListProduct.new
+  dto = DomainCore::Dtos::ListProductInputDto.new
   dto.id = params[:id]
   dto.situation = params[:situation]
 

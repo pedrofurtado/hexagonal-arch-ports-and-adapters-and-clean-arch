@@ -11,8 +11,11 @@ require_relative 'repositories/product'
 require_relative 'use-cases/callback-handlers'
 require_relative 'use-cases/list-products'
 
-require_relative 'dtos/list-product'
+require_relative 'dtos/list-product-input-dto'
+require_relative 'dtos/list-product-output-dto'
 
 require_relative 'validators/list-product'
+
+require_relative 'presenters/product'
 
 require_relative 'initialization'

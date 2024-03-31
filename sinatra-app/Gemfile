@@ -14,3 +14,6 @@ gem 'rackup'
 gem "sqlite3"
 gem "pg"
 gem "mysql2"
+#domain core - presenter
+gem 'terminal-table'
+gem 'xml-simple'

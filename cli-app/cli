@@ -15,13 +15,8 @@ class MyCLI < Thor
   option :situation
   def list_all_products
     list_products_use_case = DomainCore::UseCases::ListProducts.new do |callbacks|
-      callbacks.on_success = Proc.new do |products_records_list|
-        rows = products_records_list.map do |product_record|
-          [product_record.id, product_record.name, product_record.status]
-        end
-
-        table = ::Terminal::Table.new :title => "Products", :headings => ['ID', 'Full name', 'Status'], :rows => rows
-        puts table
+      callbacks.on_success = Proc.new do |product_presenter|
+        puts product_presenter.convert_to_ascii_terminal_table
       end
 
       callbacks.on_failure = Proc.new do |error|
@@ -30,7 +25,7 @@ class MyCLI < Thor
       end
     end
 
-    dto = DomainCore::Dtos::ListProduct.new
+    dto = DomainCore::Dtos::ListProductInputDto.new
     dto.id = options[:id]
     dto.situation = options[:situation]
 

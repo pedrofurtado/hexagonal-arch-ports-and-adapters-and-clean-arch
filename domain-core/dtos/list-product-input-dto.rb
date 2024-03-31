@@ -1,6 +1,6 @@
 module DomainCore
   module Dtos
-    class ListProduct
+    class ListProductInputDto
       attr_accessor :id, :situation
     end
   end
